@@ -24,8 +24,8 @@ def align_and_calculate_length_bias(genome_1_file,
                           genome_1_file,
                           genome_2_file,
                           length_bias_file)
-    if not keep_alignments:
-        remove(alignment_file)
+    # if not keep_alignments:
+    #     remove(alignment_file)
     return length_bias_file
 
 
@@ -56,6 +56,7 @@ def align_genomes(contig1,
     
     random.seed(random_seed)
     # Assumes that files are named strain.contigextension.renamed.mugsy
+    # accounts for also MAG_D2.1_4.fa.renamed.mugsy
     strain1 = '.'.join(path.basename(contig1).split('.')[0:-3])
     strain2 = '.'.join(path.basename(contig2).split('.')[0:-3])
     correct_name = '{strain1}_@_{strain2}.maf'.format(strain1 = strain1, strain2 = strain2) 
@@ -85,10 +86,10 @@ def align_genomes(contig1,
 
 
         # Remove unneeded files
-        remove('{align_directory}/{random_contig1}.tempcontig'.format(random_contig1=out_id_1, align_directory=alignment_dir))
-        remove('{align_directory}/{random_contig2}.tempcontig'.format(random_contig2=out_id_2, align_directory=alignment_dir))
-        remove('{align_directory}/{prefix}'.format(prefix=prefix, align_directory=alignment_dir))
-        remove('{prefix}.mugsy.log'.format(prefix=prefix))
+        # remove('{align_directory}/{random_contig1}.tempcontig'.format(random_contig1=out_id_1, align_directory=alignment_dir))
+        # remove('{align_directory}/{random_contig2}.tempcontig'.format(random_contig2=out_id_2, align_directory=alignment_dir))
+        # remove('{align_directory}/{prefix}'.format(prefix=prefix, align_directory=alignment_dir))
+        # remove('{prefix}.mugsy.log'.format(prefix=prefix))
 
         system('mv {random_alignment_name} {correct_name}'.format(random_alignment_name=alignment_dir+'/'+prefix +'.maf',
                                                                   correct_name=alignment_dir+'/'+correct_name))

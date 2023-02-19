@@ -8,10 +8,10 @@ mkdir -p ${final_output_dir}
 
 # Path to mugsy and mugsyenv.sh. Please provide absolute path.
 mugsy_path=$(which mugsy)
-mugsy_env=$(which mugsy)/mugsyenv.sh
+mugsy_env=${mugsy_path%%mugsy}mugsyenv.sh
 
 # Path to infomap executable. Please provide absolute path.
-infomap_path=$(which infomap)
+infomap_path=$(which Infomap)
 
 # Path to genome files.
 genome_dir=/scratch/aprasad/211018_Medgenome_india_samples/11_popcogent/00_Genomes

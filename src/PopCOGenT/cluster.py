@@ -72,7 +72,8 @@ def main():
     nx.write_graphml(G_unclust, graphml_unclust_name)
 
     # Loops over each connected component of the initial network
-    for i, component in enumerate(nx.connected_component_subgraphs(G_unclust)):
+    # for i, component in enumerate(nx.connected_component_subgraphs(G_unclust)):
+    for i, component in enumerate(G_unclust.subgraph(c) for c in nx.connected_components(G_unclust)):
 
         # First checks if the component contains more than 1 node
         if(len(component.nodes())) > 1:
@@ -240,10 +241,11 @@ def make_edgefile(infile,
     # Find clonal clusters
     clonal_df = trn_table[trn_table['Initial divergence'] < clonal_cutoff][['Strain 1', 'Strain 2']]
     print(clonal_df)
-    clones = nx.from_pandas_dataframe(clonal_df,
+    clones = nx.from_pandas_edgelist(clonal_df,
                                       'Strain 1',
                                       'Strain 2')
-    clonal_components = tuple(nx.connected_component_subgraphs(clones))
+    # clonal_components = tuple(nx.connected_component_subgraphs(clones))
+    clonal_components = tuple(clones.subgraph(c) for c in nx.connected_components(clones))
     flat_clones = [node for cluster in clonal_components for node in cluster.nodes()]
 
     # Get edges between clonal clusters
