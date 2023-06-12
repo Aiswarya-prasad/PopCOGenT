@@ -45,17 +45,24 @@ def main():
 
     # Checks inputs to see if they're valid
     check_inputs(args)
-    infile = args.length_bias_file
+    infile = "/scratch/aprasad/20230313_apis_species_comparison/results/12_popcogent/g__Apibacter/g__Apibacter.length_bias.txt"
     infomap_path = args.infomap_path
     infomap_args = args.infomap_args
-    outfile_base = args.base_name
-    clonal_cutoff = args.clonal_cutoff
+    outfile_base = "g__Apibacter"
+    clonal_cutoff = 0.000355362
     output_dir = args.output_directory
-    single_cell = args.single_cell
-    infomap_outdir = os.path.join(output_dir, 'infomap_out')
+    single_cell = ''
+    # infile = args.length_bias_file
+    # infomap_path = args.infomap_path
+    # infomap_args = args.infomap_args
+    # outfile_base = args.base_name
+    # clonal_cutoff = args.clonal_cutoff
+    # output_dir = args.output_directory
+    # single_cell = args.single_cell
+    infomap_outdir = os.path.join(os.path.dirname(infile), "infomap_out")
     if not os.path.exists(infomap_outdir):
         print('Ouput directory does not exist. Creating new directory.')
-        os.makedirs(infomap_outdir)
+        os.makedirs('infomap_out')
 
     # Initializing lists and dictionaries
     final_clusters = defaultdict(list)
@@ -72,13 +79,15 @@ def main():
                   clonal_cutoff=clonal_cutoff,
                   single_cell=single_cell,
                   linear_model=negative_selection_linear_fit())
+    # initial_edgefile= "/scratch/aprasad/20230313_apis_species_comparison/results/12_popcogent/g__Apibacter/g__Apibacter_0.000355362.txt"
     G_unclust = nx.read_edgelist(initial_edgefile, data=(('weight', float),))
     nx.write_graphml(G_unclust, graphml_unclust_name)
 
     # Loops over each connected component of the initial network
     # for i, component in enumerate(nx.connected_component_subgraphs(G_unclust)):
+    initial_edgefile = "/scratch/aprasad/20230313_apis_species_comparison/scripts/PopCOGenT/src/PopCOGenT/infomap_out/g__Apibacter_0.000355362.txt"
     for i, component in enumerate(G_unclust.subgraph(c) for c in nx.connected_components(G_unclust)):
-
+        print(component.nodes())
         # First checks if the component contains more than 1 node
         if(len(component.nodes())) > 1:
             outname = '{initial_edgefile}_{clustnum}.net'.format(initial_edgefile=initial_edgefile,
@@ -106,15 +115,17 @@ def main():
                     else:
                         new_lines.append(line)
             with open(outname, 'w') as outfile:
-                outfile.writelines(new_lines)
+                # printlines(new_lines)
+                print(new_lines)
 
             # Runs infomap
-            cmd = '{infomap} -i pajek {infomap_args} {pajek_file} {infomap_out}/'.format(infomap_out=infomap_outdir,infomap=infomap_path,
-                                                                                       pajek_file=outname,
-                                                                                       infomap_args=infomap_args)
-            os.system(cmd)
+            # cmd = '{infomap} -i pajek {infomap_args} {pajek_file} {infomap_out}/'.format(infomap=infomap_path,
+            #                                                                            pajek_file=outname,
+            #                                                                            infomap_args=infomap_args, infomap_out=infomap_outdir)
+            # os.system(cmd)
 
             # Parse the final cluster file
+            print("reached here")
 
             # Get subclusters and number them
             subcluster_strings = []
@@ -134,7 +145,7 @@ def main():
                     final_clusters[cluster_id].append(name.replace('"', ''))
 
         else:
-            final_clusters[str(i) + '.0'].append(list(component.nodes())[0])
+            final_clusters[str(i) + '.0'].append(component.nodes()[0])
 
     # Enforces that final populations must be cliques if there is an obvious reason to cut out a node (i.e., a single max clique)
     cluster_dict = {}
@@ -301,16 +312,16 @@ def make_edgefile(infile,
             else:
                 non_singleton.append(n2)
 
-            outfile.write('\t'.join([str(n1), str(n2), str(e) + '\n']))
+            print('\t'.join([str(n1), str(n2), str(e) + '\n']))
 
         for cindex in set(list(range(0, len(clonal_components)))) - set(cc):
             for c in clonal_components[cindex]:
                 non_singleton.append(c)
             n = ','.join(clonal_components[cindex])
-            outfile.write('\t'.join([str(n), str(n), '0\n']))
+            print('\t'.join([str(n), str(n), '0\n']))
 
         for n in set(all_strains) - set(non_singleton):
-            outfile.write('\t'.join([str(n), str(n), '0\n']))
+            print('\t'.join([str(n), str(n), '0\n']))
 
 
 if __name__ == '__main__':
